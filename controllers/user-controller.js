@@ -84,7 +84,7 @@ exports.postBooking = (req, res, next) => {
       date: req.body.date,
       time: req.body.time,
       hospital: req.body.hospital,
-      token: result.length,
+      token: result.length + 1,
     });
 
     newBooking
@@ -144,18 +144,85 @@ exports.getHospitals = (req, res, next) => {
 };
 
 exports.getProfile = (req, res, next) => {
-  const userId = req.params.userId
-  User.findById(userId).then(result => {
-    Record.find({patient: userId}).then(records => {
+  const userId = req.params.userId;
+  User.findById(userId).then((result) => {
+    Record.find({ patient: userId })
+      .populate("patient")
+      .then((records) => {
+        Booking.find({ user: userId })
+          .populate("user")
+          .then((bookings) => {
+            res.send({
+              name: result.name,
+              email: result.email,
+              address: result.address,
+              contactNo: result.contactNo,
+              gender: result.gender,
+              NIC: result.NIC,
+              records: records,
+              bookings: bookings,
+            });
+          });
+      });
+  });
+};
+
+exports.updateProfile = (req, res, next) => {
+  const userId = req.body.userId;
+  User.findById(userId).then((result) => {
+    result.name = req.body.name;
+    result.email = req.body.email;
+    result.address = req.body.address;
+    result.NIC = req.body.NIC;
+    result.gender = req.body.gender;
+    result.contactNo = req.body.contactNo;
+    result.save().then(() => {
       res.send({
-        name: result.name,
-        email: result.email,
-        address: result.address,
-        contactNo: result.contactNo,
-        gender: result.gender,
-        NIC: result.NIC,
-        records: records
-      })
-    })
-  })
-}
+        message: "Account SuccessFully Updated",
+      });
+    });
+  });
+};
+
+exports.getAnalytics = (req, res, next) => {
+  Record.find({ pending: false }).then((result) => {
+    let bookings = {
+
+    };
+
+    result.forEach((item) => {
+      const date = (new Date(item.createdAt.toString()).toISOString()).split("T")[0]
+      if(new Date().getTime() - new Date(date).getTime() <= 604800000){
+        if (bookings[date]){
+          
+          bookings[date].count++;
+          if (item.result === "positive") {
+            bookings[date].positive++;
+          }
+        }
+        else {
+          if (item.result === "positive") {
+            bookings[date] = {
+              count: 1,
+              positive: 1,
+            }
+          }
+          else {
+            bookings[date] = {
+              count: 1,
+              positive: 0,
+            }
+          }
+          
+        }
+      }
+    });
+    let averages = {};
+    
+    for (var key in bookings){
+      averages[key] = Math.round(bookings[key].positive / bookings[key].count *100) 
+    }
+    console.log(averages)
+    res.send(averages);
+  }).catch(console.log);
+};

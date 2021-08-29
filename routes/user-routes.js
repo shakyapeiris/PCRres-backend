@@ -11,6 +11,11 @@ router.get('/bookings/:userId', userController.getBookings)
 
 router.get('/hospitals', userController.getHospitals)
 
+router.post('/update', userController.updateProfile)
+
+router.get('/analytics', userController.getAnalytics)
+
 router.get('/:userId', userController.getProfile)
+
 
 module.exports = router;

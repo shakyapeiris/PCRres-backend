@@ -17,6 +17,9 @@ const BookingSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Admin",
     },
+    token: {
+      type: Number
+    }
   },
   { timestamps: true }
 );

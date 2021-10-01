@@ -31,3 +31,5 @@ mongoose
 app.listen(process.env.PORT || 5000, () => {
   console.log("App Started");
 });
+
+module.exports = app;

@@ -42,7 +42,7 @@ exports.postRegister = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  User.findOne({ email: req.body.email }, function (err, user) {
+  User.findOne({ email: req.body.email }).then((user) => {
     if (user === null) {
       return res.status(400).send({
         successful: false,
@@ -185,44 +185,44 @@ exports.updateProfile = (req, res, next) => {
 };
 
 exports.getAnalytics = (req, res, next) => {
-  Record.find({ pending: false }).then((result) => {
-    let bookings = {
+  Record.find({ pending: false })
+    .then((result) => {
+      let bookings = {};
 
-    };
-
-    result.forEach((item) => {
-      const date = (new Date(item.createdAt.toString()).toISOString()).split("T")[0]
-      if(new Date().getTime() - new Date(date).getTime() <= 604800000){
-        if (bookings[date]){
-          
-          bookings[date].count++;
-          if (item.result === "positive") {
-            bookings[date].positive++;
-          }
-        }
-        else {
-          if (item.result === "positive") {
-            bookings[date] = {
-              count: 1,
-              positive: 1,
+      result.forEach((item) => {
+        const date = new Date(item.createdAt.toString())
+          .toISOString()
+          .split("T")[0];
+        if (new Date().getTime() - new Date(date).getTime() <= 604800000) {
+          if (bookings[date]) {
+            bookings[date].count++;
+            if (item.result === "positive") {
+              bookings[date].positive++;
+            }
+          } else {
+            if (item.result === "positive") {
+              bookings[date] = {
+                count: 1,
+                positive: 1,
+              };
+            } else {
+              bookings[date] = {
+                count: 1,
+                positive: 0,
+              };
             }
           }
-          else {
-            bookings[date] = {
-              count: 1,
-              positive: 0,
-            }
-          }
-          
         }
+      });
+      let averages = {};
+
+      for (var key in bookings) {
+        averages[key] = Math.round(
+          (bookings[key].positive / bookings[key].count) * 100
+        );
       }
-    });
-    let averages = {};
-    
-    for (var key in bookings){
-      averages[key] = Math.round(bookings[key].positive / bookings[key].count *100) 
-    }
-    console.log(averages)
-    res.send(averages);
-  }).catch(console.log);
+      console.log(averages);
+      res.send(averages);
+    })
+    .catch(console.log);
 };

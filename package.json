@@ -4,7 +4,7 @@
   "description": "This is the api of pcr-res.lk",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon server.js"
   },
   "author": "Shakya Peiris",
@@ -16,5 +16,9 @@
     "express": "^4.17.1",
     "mongodb": "^4.1.1",
     "mongoose": "^6.0.1"
+  },
+  "devDependencies": {
+    "jest": "^27.2.4",
+    "supertest": "^6.1.6"
   }
 }

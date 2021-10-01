@@ -1,0 +1,11 @@
+# This is a comment
+# */temp* refer to any file inside a sub dir of root dir which name starts with temp
+# */*/temp* refer to any file inside a sub dir of a sub dir of root dir which name starts with temp
+# temp? is refer to all files which has a difference of one character in file name eg: tempa, tempb
+# **/*.go refers to any file inside the working dir that ends with .go
+
+
+# *.md
+# !README.md selects all files excluding README file
+
+node_modules

@@ -39,6 +39,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
   automerge:
+    needs: [Build_and_Test]
     runs-on: ubuntu-latest
     steps:
       - name: Merge pull request
